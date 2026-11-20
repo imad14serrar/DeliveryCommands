@@ -84,7 +84,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedOrders() {
-        String a = demoOrder("Client", "Démo A", "Marrakech", "S-001", List.of(new Line(1L, 2), new Line(8L, 1)));
+        String a = demoOrder("Client", "Démo A", "Fès", "S-001", List.of(new Line(1L, 2), new Line(8L, 1)));
         String b = demoOrder("Client", "Démo B", "Casablanca", "S-002", List.of(new Line(4L, 1)));
         demoOrder("Client", "Démo C", "Rabat", "S-003", List.of(new Line(6L, 1), new Line(7L, 1)));
         shipmentService.updateStatus(a, ShipmentStatus.ON_THE_WAY);
@@ -95,7 +95,7 @@ public class DataSeeder implements CommandLineRunner {
     private String demoOrder(String firstName, String lastName, String city, String type, List<Line> lines) {
         String email = "demo." + lastName.substring(lastName.length() - 1).toLowerCase() + "@example.com";
         return shipmentService.create(new CreateShipmentRequest(firstName, lastName, "0600000000", email,
-                "1 avenue de démonstration", city, "40000", type, lines)).code();
+                "1 avenue de démonstration", city, "30000", type, lines)).code();
     }
 
     private static Product product(String code, String name, int stock, String price, String image, Category category) {

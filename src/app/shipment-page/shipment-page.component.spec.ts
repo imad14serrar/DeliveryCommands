@@ -45,10 +45,10 @@ describe('ShipmentPageComponent', () => {
   it('enregistre les informations et passe au paiement si le formulaire est valide', () => {
     component.form.patchValue({
       firstName: 'Sara', lastName: 'Test', phone: '0612345678', email: 'sara@example.com',
-      address: '12 rue des Tests', city: 'Marrakech', postalCode: '40000'
+      address: '12 rue des Tests', city: 'Fès', postalCode: '30000'
     });
     component.submit();
-    expect(TestBed.inject(CheckoutService).shipping?.city).toBe('Marrakech');
+    expect(TestBed.inject(CheckoutService).shipping?.city).toBe('Fès');
     expect(router.navigate).toHaveBeenCalledWith(['/paiement']);
   });
 });

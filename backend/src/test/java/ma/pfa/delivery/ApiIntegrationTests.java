@@ -38,7 +38,7 @@ class ApiIntegrationTests {
     private static String order(String phone, int quantity) {
         return """
                 {"firstName":"Sara","lastName":"Test","phone":"%s","email":"sara@example.com",
-                 "address":"12 rue des Tests","city":"Marrakech","postalCode":"40000",
+                 "address":"12 rue des Tests","city":"Fès","postalCode":"30000",
                  "shipmentTypeCode":"S-001","items":[{"productId":1,"quantity":%d},{"productId":2,"quantity":1}]}
                 """.formatted(phone, quantity);
     }

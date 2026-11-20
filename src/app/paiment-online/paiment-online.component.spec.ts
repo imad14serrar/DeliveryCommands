@@ -22,7 +22,7 @@ describe('PaimentOnlineComponent', () => {
     cart.add(aProduct());
     TestBed.inject(CheckoutService).saveShipping({
       firstName: 'Sara', lastName: 'Test', phone: '0612345678', email: 'sara@example.com',
-      address: '12 rue des Tests', city: 'Marrakech', postalCode: '40000', shipmentTypeCode: 'S-001'
+      address: '12 rue des Tests', city: 'Fès', postalCode: '30000', shipmentTypeCode: 'S-001'
     }, SHIPMENT_TYPES[0]);
     router = TestBed.inject(Router);
     spyOn(router, 'navigate');

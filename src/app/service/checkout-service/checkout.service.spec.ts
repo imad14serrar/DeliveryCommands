@@ -6,7 +6,7 @@ import { CHECKOUT_STORAGE_KEY, CheckoutService } from './checkout.service';
 
 const SHIPPING: ShippingInfo = {
   firstName: 'Sara', lastName: 'Test', phone: '0612345678', email: 'sara@example.com',
-  address: '12 rue des Tests', city: 'Marrakech', postalCode: '40000', shipmentTypeCode: 'S-001'
+  address: '12 rue des Tests', city: 'Fès', postalCode: '30000', shipmentTypeCode: 'S-001'
 };
 
 describe('CheckoutService', () => {

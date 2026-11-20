@@ -7,7 +7,7 @@ export const environment = {
   contact: {
     email: 'contact@exemple.ma',
     phone: '+212 5 00 00 00 00',
-    address: 'Marrakech, Maroc',
+    address: 'ENSA Fès, Maroc',
     hours: 'Lundi – samedi : 9h30 – 22h30'
   }
 };

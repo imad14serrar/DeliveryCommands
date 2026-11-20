@@ -8,7 +8,7 @@ import { CheckoutService } from '../service/checkout-service/checkout.service';
 import { DataService } from '../service/data-service/data.service';
 import { PHONE_PATTERN, POSTAL_CODE_PATTERN } from '../shared/validators';
 
-export const CITIES = ['Agadir', 'Casablanca', 'Fès', 'Marrakech', 'Meknès', 'Oujda', 'Rabat', 'Tanger', 'Tétouan'];
+export const CITIES = ['Agadir', 'Casablanca', 'Fès', 'Meknès', 'Oujda', 'Rabat', 'Tanger', 'Tétouan'];
 
 /** Étape 2 du tunnel : informations de livraison et choix du mode de livraison. */
 @Component({
