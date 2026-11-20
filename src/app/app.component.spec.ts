@@ -1,29 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { NavbarComponent } from './navbar/navbar.component';
+import { setupTestBed } from './testing/test-helpers';
 
 describe('AppComponent', () => {
-  beforeEach(() => TestBed.configureTestingModule({
-    imports: [RouterTestingModule],
-    declarations: [AppComponent]
-  }));
+  beforeEach(() => setupTestBed([AppComponent, NavbarComponent]));
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
-
-  it(`should have as title 'app-DeliveryCommands'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('app-DeliveryCommands');
-  });
-
-  it('should render title', () => {
+  it('affiche la barre de navigation et la zone de routage', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('app-DeliveryCommands app is running!');
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('app-navbar')).not.toBeNull();
+    expect(el.querySelector('router-outlet')).not.toBeNull();
   });
 });

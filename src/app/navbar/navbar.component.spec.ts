@@ -1,21 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TestBed } from '@angular/core/testing';
+import { CartService } from '../service/cart-service/cart.service';
+import { aProduct, setupTestBed } from '../testing/test-helpers';
 import { NavbarComponent } from './navbar.component';
 
 describe('NavbarComponent', () => {
-  let component: NavbarComponent;
-  let fixture: ComponentFixture<NavbarComponent>;
+  beforeEach(() => setupTestBed([NavbarComponent]));
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [NavbarComponent]
-    });
-    fixture = TestBed.createComponent(NavbarComponent);
-    component = fixture.componentInstance;
+  it('affiche le nombre d\'articles du panier dans le badge, mis à jour en direct', () => {
+    const fixture = TestBed.createComponent(NavbarComponent);
     fixture.detectChanges();
-  });
+    const badge = () => (fixture.nativeElement as HTMLElement).querySelector('.cart-badge');
+    expect(badge()).toBeNull(); // panier vide : pas de badge
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    const cart = TestBed.inject(CartService);
+    cart.add(aProduct({ id: 1, stock: 5 }));
+    cart.add(aProduct({ id: 1, stock: 5 }));
+    fixture.detectChanges();
+    expect(badge()?.textContent?.trim()).toBe('2');
   });
 });
