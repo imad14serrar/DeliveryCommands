@@ -1,9 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
+/* Styles globaux */
 @import "~@fortawesome/fontawesome-free/css/all.css";
 
-
-
-body{
-  background-color: #F8F8FF;
+body {
+  background-color: #f8f8ff;
+  font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
 }
-
