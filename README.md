@@ -19,13 +19,6 @@ Espace admin : http://localhost:4200/admin (icône bouclier dans le menu).
 
 Le mot de passe peut être remplacé sans modifier le code avec la variable d'environnement `ADMIN_PASSWORD`.
 
-## Origine du projet
-
-Ce projet de fin d'année (PFA) part d'une application Angular existante, *app-DeliveryCommands*,
-réalisée en mai–juin 2023 par benaarrouch, hamdanimed et OussamaDarif.
-Le premier commit du dépôt importe ce code tel quel ; les commits suivants sont mes améliorations :
-backend Spring Boot, corrections, interface en français, espace administrateur et tests.
-
 ---
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.1.
