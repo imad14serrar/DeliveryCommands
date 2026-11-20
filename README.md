@@ -1,4 +1,32 @@
-# AppDeliveryCommands
+# DeliveryCommands
+
+Boutique en ligne avec suivi de livraison : frontend Angular 16 + backend Spring Boot (`backend/`).
+
+## Lancer le projet
+
+| Partie | Dossier | Commande | Adresse |
+|---|---|---|---|
+| API (Java 17) | `backend/` | `.\mvnw spring-boot:run` | http://localhost:8080 |
+| Site (Node 18) | racine | `npm install` puis `npm start` | http://localhost:4200 |
+
+## Accès administrateur
+
+Espace admin : http://localhost:4200/admin (icône bouclier dans le menu).
+
+| Identifiant | Mot de passe |
+|---|---|
+| `admin` | `Mas*2026*2027` |
+
+Le mot de passe peut être remplacé sans modifier le code avec la variable d'environnement `ADMIN_PASSWORD`.
+
+## Origine du projet
+
+Ce projet de fin d'année (PFA) part d'une application Angular existante, *app-DeliveryCommands*,
+réalisée en mai–juin 2023 par benaarrouch, hamdanimed et OussamaDarif.
+Le premier commit du dépôt importe ce code tel quel ; les commits suivants sont mes améliorations :
+backend Spring Boot, corrections, interface en français, espace administrateur et tests.
+
+---
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.1.
 
