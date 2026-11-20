@@ -1,0 +1,109 @@
+<div class="container py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+      <h1 class="h3 mb-0">Tableau de bord</h1>
+      <p class="text-muted small mb-0">Connecté en tant que {{ auth.session?.username }}</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary btn-sm" (click)="refresh()"><i class="fa-solid fa-rotate me-1"></i>Actualiser</button>
+      <button class="btn btn-outline-secondary btn-sm" (click)="logout()"><i class="fa-solid fa-right-from-bracket me-1"></i>Déconnexion</button>
+    </div>
+  </div>
+
+  <!-- Indicateurs -->
+  <div class="row g-3 mb-4" *ngIf="stats as s">
+    <div class="col-6 col-lg-3">
+      <div class="card stat-card h-100"><div class="card-body">
+        <p class="stat-label">Commandes</p><p class="stat-value">{{ s.totalOrders }}</p>
+      </div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card stat-card h-100"><div class="card-body">
+        <p class="stat-label">Chiffre d'affaires</p><p class="stat-value">{{ s.totalRevenue | currency: 'MAD':'symbol':'1.0-0' }}</p>
+      </div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card stat-card h-100"><div class="card-body">
+        <p class="stat-label">À livrer</p><p class="stat-value">{{ pendingOrders }}</p>
+      </div></div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card stat-card h-100" [class.border-warning]="s.lowStockProducts.length > 0"><div class="card-body">
+        <p class="stat-label">Stock faible (≤ 5)</p><p class="stat-value">{{ s.lowStockProducts.length }}</p>
+        <p class="small text-muted mb-0" *ngIf="s.lowStockProducts.length">
+          <ng-container *ngFor="let p of s.lowStockProducts; let last = last">{{ p.name }} ({{ p.stock }}){{ last ? '' : ', ' }}</ng-container>
+        </p>
+      </div></div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <div class="btn-group btn-group-sm flex-wrap" role="group" aria-label="Filtrer par statut">
+      <button class="btn" [ngClass]="statusFilter === '' ? 'btn-primary' : 'btn-outline-primary'" (click)="setStatusFilter('')">
+        Toutes <span class="badge bg-light text-dark ms-1">{{ stats?.totalOrders ?? 0 }}</span>
+      </button>
+      <button *ngFor="let step of steps" class="btn" (click)="setStatusFilter(step.status)"
+              [ngClass]="statusFilter === step.status ? 'btn-primary' : 'btn-outline-primary'">
+        {{ step.label }} <span class="badge bg-light text-dark ms-1">{{ stats?.ordersByStatus?.[step.status] ?? 0 }}</span>
+      </button>
+    </div>
+    <input type="search" class="form-control form-control-sm ms-auto search-box" [(ngModel)]="search"
+           placeholder="Rechercher (code, client, ville…)" aria-label="Rechercher une commande">
+  </div>
+
+  <!-- Liste des commandes -->
+  <div class="table-responsive bg-white border rounded">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Code</th><th>Date</th><th>Client</th><th class="d-none d-md-table-cell">Livraison</th>
+          <th class="text-end">Total</th><th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="visibleShipments.length === 0">
+          <td colspan="6" class="text-center text-muted py-4">Aucune commande.</td>
+        </tr>
+        <ng-container *ngFor="let s of visibleShipments; trackBy: trackByCode">
+          <tr class="order-row" (click)="toggle(s.code)">
+            <td class="font-monospace small">
+              <i class="fa-solid me-1" [ngClass]="expandedCode === s.code ? 'fa-chevron-down' : 'fa-chevron-right'"></i>{{ s.code }}
+            </td>
+            <td class="small">{{ s.orderDate | date: 'short' }}</td>
+            <td>{{ s.firstName }} {{ s.lastName }}<br><span class="small text-muted">{{ s.city }}</span></td>
+            <td class="d-none d-md-table-cell small">{{ s.shipmentType.name }}</td>
+            <td class="text-end">{{ s.payment.total | currency }}</td>
+            <td (click)="$event.stopPropagation()">
+              <select class="form-select form-select-sm status-select" [ngModel]="s.status"
+                      (ngModelChange)="changeStatus(s, $event)" [disabled]="updatingCode === s.code"
+                      [attr.aria-label]="'Statut de la commande ' + s.code">
+                <option *ngFor="let step of steps" [ngValue]="step.status">{{ step.label }}</option>
+              </select>
+            </td>
+          </tr>
+          <tr *ngIf="expandedCode === s.code" class="details-row">
+            <td colspan="6">
+              <div class="row small">
+                <div class="col-md-5 mb-2">
+                  <strong>Coordonnées</strong><br>
+                  {{ s.address }}, {{ s.postalCode }} {{ s.city }}<br>
+                  <i class="fa-solid fa-phone me-1"></i>{{ s.phone }} · <i class="fa-solid fa-envelope me-1"></i>{{ s.email }}<br>
+                  <span class="text-muted">Dernière mise à jour : {{ s.updatedAt | date: 'short' }}</span>
+                </div>
+                <div class="col-md-7">
+                  <strong>Articles</strong>
+                  <ul class="mb-1 ps-3">
+                    <li *ngFor="let item of s.items">{{ item.quantity }} × {{ item.productName }} — {{ item.lineTotal | currency }}</li>
+                  </ul>
+                  <span>Produits {{ s.payment.productsTotal | currency }} + livraison {{ s.payment.shipmentPrice | currency }}
+                    = <strong>{{ s.payment.total | currency }}</strong></span>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+</div>

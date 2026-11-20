@@ -1,0 +1,4 @@
+.shipment-option {
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}

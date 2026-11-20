@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { CartItem } from '../data-interfaces/CartItem';
 import { CartService } from '../service/cart-service/cart.service';
-import { Product } from '../data-interfaces/Product';
 
 @Component({
   selector: 'app-cart',
@@ -9,41 +8,32 @@ import { Product } from '../data-interfaces/Product';
   styleUrls: ['./cart.component.css']
 })
 export class CartComponent {
-  totalPrice :number = 0;
-  items: Product[] = [];
+  /** Le template s'abonne au panier : tout changement (quantité, suppression) met la page à jour. */
+  readonly items$ = this.cartService.items$;
+  readonly total$ = this.cartService.total$;
 
-  constructor(public router: Router, private cartService: CartService) {}
-  
+  constructor(private cartService: CartService) {}
 
-  ngOnInit() {
-    this.items = this.cartService.getItems(); // Assign the items from the cart service
-    this.calculateTotalPrice();
+  increaseQuantity(item: CartItem): void {
+    this.cartService.setQuantity(item.product.id, item.quantity + 1);
   }
 
-  removeItem(index: number) {
-    this.cartService.removeItem(index);
-    this.calculateTotalPrice();
+  decreaseQuantity(item: CartItem): void {
+    this.cartService.setQuantity(item.product.id, item.quantity - 1);
   }
 
-  confirmPayment() {
-    console.log(this.items)
-    this.router.navigate(['/shippement-page'],{state:{totalPrice:this.totalPrice,products:this.items}})
-    
+  /** Saisie manuelle : la quantité est bornée entre 1 et le stock par le service. */
+  onQuantityInput(item: CartItem, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.cartService.setQuantity(item.product.id, Number(input.value));
+    input.value = String(this.cartService.items.find(i => i.product.id === item.product.id)?.quantity ?? 1);
   }
 
-  calculateTotalPrice(): void {
-    this.totalPrice = this.cartService.calculateTotalPrice();
+  removeItem(item: CartItem): void {
+    this.cartService.remove(item.product.id);
   }
 
-  increaseQuantity(item: Product) {
-    item.quantity++;
-    this.calculateTotalPrice();
-  }
-
-  decreaseQuantity(item: Product) {
-    if (item.quantity > 1) {
-      item.quantity--;
-      this.calculateTotalPrice();
-    }
+  trackByProduct(_: number, item: CartItem): number {
+    return item.product.id;
   }
 }

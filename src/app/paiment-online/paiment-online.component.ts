@@ -1,126 +1,84 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { map, startWith } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { CartService } from '../service/cart-service/cart.service';
+import { CheckoutService } from '../service/checkout-service/checkout.service';
 import { DataService } from '../service/data-service/data.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { detectCardType, expiryValidator, luhnValidator } from '../shared/validators';
 
+/**
+ * Étape 3 du tunnel : paiement (SIMULÉ).
+ * Les données de carte sont seulement vérifiées dans le navigateur (format, Luhn, date) et ne sont
+ * jamais envoyées au serveur. Seule la commande (produits + livraison) est transmise.
+ */
 @Component({
   selector: 'app-paiment-online',
   templateUrl: './paiment-online.component.html',
   styleUrls: ['./paiment-online.component.css']
 })
-export class PaimentOnlineComponent implements OnInit {
-  paymentForm!: FormGroup;
-  activeTab: string = 'credit-card';
-  cardType: string = '';
-  pendingPayment=false;
+export class PaimentOnlineComponent {
+  pendingPayment = false;
 
-  constructor(
-    private router: Router,
-    private dataService: DataService,
-    private formBuilder: FormBuilder,
-    private snackBar: MatSnackBar
-  ) {}
-
-  ngOnInit() {
-    this.paymentForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.minLength(2)]],
-      cardNumber: ['', [Validators.required, Validators.pattern('[0-9]{16}')]],
+  readonly paymentForm = this.fb.nonNullable.group(
+    {
+      cardOwner: ['', [Validators.required, Validators.minLength(2)]],
+      cardNumber: ['', [Validators.required, Validators.pattern(/^\d{13,19}$/), luhnValidator]],
       expMonth: ['', [Validators.required, Validators.min(1), Validators.max(12)]],
       expYear: ['', [Validators.required, Validators.min(0), Validators.max(99)]],
-      cvv: ['', [Validators.required, Validators.pattern('[0-9]{3}')]]
-    });
+      cvv: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]]
+    },
+    { validators: expiryValidator() }
+  );
 
-    this.paymentForm.get('cardNumber')?.valueChanges.subscribe(cardNumber => {
-      this.cardType = this.detectCardType(cardNumber);
-    });
+  readonly cardType$ = this.paymentForm.controls.cardNumber.valueChanges.pipe(
+    startWith(''),
+    map(value => detectCardType(value))
+  );
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private dataService: DataService,
+    private cart: CartService,
+    public checkout: CheckoutService,
+    private toastr: ToastrService
+  ) {}
+
+  get productsTotal(): number {
+    return this.cart.total;
   }
 
-  onSelectTab(tab: string) {
-    this.activeTab = tab;
+  isInvalid(name: 'cardOwner' | 'cardNumber' | 'expMonth' | 'expYear' | 'cvv'): boolean {
+    const control = this.paymentForm.controls[name];
+    return control.invalid && control.touched;
   }
 
+  get expiryInvalid(): boolean {
+    const { expMonth, expYear } = this.paymentForm.controls;
+    return !!this.paymentForm.errors?.['expired'] && expMonth.touched && expYear.touched;
+  }
 
-  submitPayment() {
-    if (this.paymentForm.valid) {
-      // Handle the form submission
-      this.pendingPayment=true;
-      this.dataService.createShipment(this.dataService.bodyToSend).subscribe(response => {
-        console.log(response);
-        this.pendingPayment=false;
-
-      });
-      this.snackBar.open('Payment confirmed', 'Close', {
-        duration: 2500, // Duration in milliseconds
-      });
-      this.router.navigate(['/']);
-      this.dataService.bodyToSend={code:"",fname:"",lname:"",tel:"",address:"",city:"",postalCode:"",zip:"",email:"",status:"",shipmentType:"",products:[],paiement:{}};
-    } else {
-      // Display validation errors
-      this.validateAllFormFields(this.paymentForm);
-      this.pendingPayment=false;
+  submitPayment(): void {
+    if (this.paymentForm.invalid || this.pendingPayment) {
+      this.paymentForm.markAllAsTouched();
+      return;
     }
-
-  }
-
-  cancelPayment() {
-    this.router.navigate(['/shippement-page']);
-  }
-
-  validateAllFormFields(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach(field => {
-      const control = formGroup.get(field);
-      if (control) {
-        if (control instanceof FormGroup) {
-          this.validateAllFormFields(control);
-        } else {
-          control.markAsTouched({ onlySelf: true });
-        }
+    this.pendingPayment = true;
+    // Correction : on attend la réponse du serveur AVANT de confirmer (avant, « Paiement confirmé »
+    // s'affichait même si la commande échouait).
+    this.dataService.createShipment(this.checkout.buildRequest()).subscribe({
+      next: shipment => {
+        this.cart.clear();
+        this.checkout.reset();
+        this.toastr.success('Votre commande a été enregistrée.', 'Merci !');
+        this.router.navigate(['/confirmation', shipment.code], { state: { shipment } });
+      },
+      error: () => {
+        // Le message d'erreur est affiché par l'ErrorInterceptor ; l'utilisateur peut réessayer.
+        this.pendingPayment = false;
       }
     });
-  }
-
-  getErrorMessage(controlName: string): string {
-    const control = this.paymentForm.get(controlName);
-    if (control && control.errors) {
-      if (control.errors['required']) {
-        return 'This field is required.';
-      }
-      if (control.errors['minlength']) {
-        return `Minimum length should be ${control.errors['minlength'].requiredLength}.`;
-      }
-      if (control.errors['maxlength']) {
-        return `Maximum length should be ${control.errors['maxlength'].requiredLength}.`;
-      }
-      if (control.errors['pattern']) {
-        return 'Invalid format.';
-      }
-      if (control.errors['min']) {
-        return `Minimum value should be ${control.errors['min'].min}.`;
-      }
-      if (control.errors['max']) {
-        return `Maximum value should be ${control.errors['max'].max}.`;
-      }
-    }
-    return '';
-  }
-
-  detectCardType(cardNumber: string): string {
-    const visaPattern = /^4/;
-    const mastercardPattern = /^5[1-5]/;
-    const amexPattern = /^3[47]/;
-    const discoverPattern = /^6(?:011|5)/;
-
-    if (cardNumber.match(visaPattern)) {
-      return 'Visa';
-    } else if (cardNumber.match(mastercardPattern)) {
-      return 'Mastercard';
-    } else if (cardNumber.match(amexPattern)) {
-      return 'American Express';
-    } else if (cardNumber.match(discoverPattern)) {
-      return 'Discover';
-    } else {
-      return 'Unknown';
-    }
   }
 }

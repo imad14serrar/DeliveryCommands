@@ -1,21 +1,15 @@
-@media(max-width:992px) {
-  .quantity-product{
-    text-align: center;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  .quantity-product input {
-    width: 70%;
-  }
-
+.quantity-input {
+  max-width: 70px;
 }
 
-@media (max-width:780px) {
-  .price-element{
-    width: 50%;
-  }
-  .trash-element{
-    width: 50%;
-  }
+/* Masque les flèches natives du champ nombre : les boutons + / - suffisent. */
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
+.cart-section img {
+  max-height: 90px;
+  object-fit: contain;
 }

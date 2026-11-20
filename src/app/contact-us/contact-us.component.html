@@ -1,77 +1,56 @@
-<section class="Material-contact-section section-padding section-dark mt-5">
+<section class="section-padding mt-5">
   <div class="container">
+    <h1 class="section-title">Contactez-nous</h1>
     <div class="row">
-      <div class="col-md-12 ">
-        <h1 class="section-title">Contact Us</h1>
-      </div>
-    </div>
-    <div class="row ">
-      <div class="col-md-6 mt-3  ">
-        <p class="text-muted">We would love to hear from you. Please fill out the form below and we will get back to you as soon as possible.
-
+      <div class="col-md-6 mt-3">
+        <p class="text-muted">
+          Une question sur une commande ou un produit ? Écrivez-nous, nous vous répondrons dans les plus brefs délais.
         </p>
-
         <ul class="list-unstyled contact-info">
+          <li class="mb-2"><i class="fas fa-building"></i><strong>Boutique :</strong> {{ shopName }}</li>
+          <li class="mb-2"><i class="fas fa-map-marker-alt"></i><strong>Adresse :</strong> {{ contact.address }}</li>
+          <li class="mb-2"><i class="fas fa-phone"></i><strong>Téléphone :</strong> {{ contact.phone }}</li>
           <li class="mb-2">
-            <i class="fas fa-building"></i>
-            <strong>Company:</strong> <a href="https://hostriver.ro"> OurStore</a>
+            <i class="fa-solid fa-envelope"></i><strong>E-mail :</strong>&nbsp;<a [href]="'mailto:' + contact.email">{{ contact.email }}</a>
           </li>
-          <li class="mb-2">
-            <i class="fas fa-map-marker-alt"></i>
-            <strong>Address:</strong> <a href="#"> Maroc Ensa Marrakech</a>
-          </li>
-          <li class="mb-2">
-            <i class="fas fa-phone"></i>
-            <strong>Phone:</strong> <a href="#"> +212676158831</a>
-          </li>
-          <li class="mb-2">
-            <i class="fa-sharp fa-solid fa-envelope"></i>
-            <strong>Email:</strong> <a href="https://uny.ro"> HamdaniSupport@gmail.com</a>
-          </li>
-          <li class="mb-2">
-            <i class="far fa-clock"></i>
-            <strong>Working Hours:</strong> Mon to Sat: 09:30 AM - 10.30 PM
-          </li>
+          <li class="mb-2"><i class="far fa-clock"></i><strong>Horaires :</strong> {{ contact.hours }}</li>
         </ul>
       </div>
-      <div class="col-md-6 support-form" data-wow-delay=".2s">
-        <form class="contact-form" role="form" method="post" id="contactForm" name="contact-form" data-toggle="validator">
+
+      <div class="col-md-6 support-form">
+        <form class="contact-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
           <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="name">Name *</label>
-                <input class="form-control rounded-2" id="name" type="text" name="name" required data-error="Please enter your name">
-                <div class="help-block with-errors"></div>
-              </div>
+            <div class="col-md-6 form-group">
+              <label for="name">Nom *</label>
+              <input id="name" class="form-control rounded-2" type="text" formControlName="name"
+                     [class.is-invalid]="invalid('name')">
+              <div class="invalid-feedback">Indiquez votre nom.</div>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="email">Email *</label>
-                <input class="form-control rounded-2" id="email" type="email" name="email" required data-error="Please enter your email">
-                <div class="help-block with-errors"></div>
-              </div>
+            <div class="col-md-6 form-group">
+              <label for="email">E-mail *</label>
+              <input id="email" class="form-control rounded-2" type="email" formControlName="email"
+                     [class.is-invalid]="invalid('email')">
+              <div class="invalid-feedback">E-mail invalide.</div>
             </div>
           </div>
           <div class="form-group">
-            <label for="msg_subject">Subject *</label>
-            <input class="form-control rounded-2" id="msg_subject" type="text" name="subject" required data-error="Please enter your message subject">
-            <div class="help-block with-errors"></div>
+            <label for="subject">Objet *</label>
+            <input id="subject" class="form-control rounded-2" type="text" formControlName="subject"
+                   [class.is-invalid]="invalid('subject')">
+            <div class="invalid-feedback">Indiquez l'objet de votre message.</div>
           </div>
           <div class="form-group">
             <label for="message">Message *</label>
-
-            <textarea class="form-control rounded-2" id="message" name="message" required data-error="Please enter your message"></textarea>
-
-
-            <div class="help-block with-errors"></div>
+            <textarea id="message" class="form-control rounded-2" rows="5" formControlName="message"
+                      [class.is-invalid]="invalid('message')"></textarea>
+            <div class="invalid-feedback">Au moins 10 caractères.</div>
           </div>
           <div class="form-submit mt-4">
-            <button class="btn btn-primary" type="submit" id="form-submit">Send Message</button>
+            <button class="btn btn-primary" type="submit">Envoyer via ma messagerie</button>
           </div>
-          <div id="msgSubmit" class="text-center mt-3">
-            <p class="h5 text-success">Your message has been sent successfully.</p>
-            <p class="h5 text-danger">Oops! Something went wrong. Please try again.</p>
-          </div>
+          <p *ngIf="opened" class="text-success mt-3 mb-0">
+            Votre messagerie s'est ouverte avec le message pré-rempli : il ne reste qu'à l'envoyer.
+          </p>
         </form>
       </div>
     </div>

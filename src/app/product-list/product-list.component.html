@@ -1,89 +1,61 @@
-<div class="container">
-
-  <div class="container">
-    <div class="d-flex justify-content-center align-items-center my-4 product-filter flex-wrap">
-        <div class="d-flex me-3 search-label">
-          <input type="text" [(ngModel)]="searchTerm" class="form-control me-1 search-input" placeholder="Search" (input)="filterProducts()">
-          <button (click)="filterProducts()" class="btn btn-primary">Search</button>
-        </div>
-      <div class="select-category ">
-        <select class="form-select" aria-label="Default select example" [(ngModel)]="selectedCategory" (change)="filterProducts()" >
-             <option selected>Categories</option>
-            <option *ngFor="let category of categories" value="{{category.code}}">{{category.name | titlecase}}</option>
-            <!-- <option value="1">Clothing</option>
-            <option value="1">Shoes & Jewelry</option>
-            <option value="2">Toys & games</option>
-            <option value="3">Electronics </option> -->
-        </select>
-      </div>
+<div class="container py-4">
+  <!-- Recherche + catégories -->
+  <div class="d-flex justify-content-center align-items-center gap-2 mb-4 flex-wrap product-filter">
+    <div class="search-label">
+      <label for="search" class="visually-hidden">Rechercher un produit</label>
+      <input id="search" type="search" [(ngModel)]="searchTerm" (input)="filterProducts()"
+             class="form-control search-input" placeholder="Rechercher un produit…">
     </div>
-</div>
-  <!-- Search + Categories -->
-  <!-- list of products -->
-  <div class="row " *ngIf="filteredProducts.length > 0; else notFound">
-    <div  *ngFor="let product of filteredProducts " class="col-lg-3 col-md-4 col-sm-6 ">
-      <div class="card my-2 shadow-2-strong product-card">
-        <img src="{{product.img_url}}" class="card-img-top" />
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">{{product.price | currency}}</h5>
-          <p class="card-text">{{product.name}}</p>
-          <p class="card-text">{{product.category.name}}</p>
-        <!--  <p><span class="text-muted">Size: </span>M <span class="text-muted">Color: </span>Grey</p> -->
-          <div class="card-footer mt-auto text-center">
-            <button type="button" (click)="addToCart(product) " class="btn btn-primary shadow-0 me-1 btn-sm">Add to cart</button>
-          </div>
-        </div>
-      </div>
+    <div class="select-category">
+      <label for="category" class="visually-hidden">Catégorie</label>
+      <select id="category" class="form-select" [(ngModel)]="selectedCategory" (change)="filterProducts()">
+        <option value="">Toutes les catégories</option>
+        <option *ngFor="let category of categories" [value]="category.code">{{ category.name }}</option>
+      </select>
     </div>
   </div>
-  <ng-template #notFound>
-    <div class="col-lg-12 text-center">
-      <h1>No products found</h1>
-    </div>
-  </ng-template>
-<!--     <div *ngIf="products.length > 0; else notFound" class="text-center d-flex text-center justify-content-center"><h1>Not found</h1> </div>
- -->    <!-- <div class="col-lg-3 col-md-4 col-sm-6 ">
-      <div class="card my-2 shadow-2-strong product-card">
-        <img src="https://bootstrap-ecommerce.com/bootstrap5-ecommerce/images/items/10.webp" class="card-img-top" />
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">$79.99</h5>
-          <p class="card-text">T-shirts with multiple colors</p>
-          <p><span class="text-muted">Size: </span>M <span class="text-muted">Color: </span>Grey</p>
-          <div class="card-footer mt-auto text-center">
-            <a href="#!" class="btn btn-primary shadow-0 me-1 btn-sm">Add to cart</a>
+
+  <!-- États : chargement / erreur -->
+  <div *ngIf="loading" class="text-center py-5 text-muted">
+    <div class="spinner-border text-primary mb-3" role="status"></div>
+    <p>Chargement du catalogue…</p>
+  </div>
+
+  <div *ngIf="loadError" class="alert alert-warning text-center">
+    Impossible de charger le catalogue.
+    <button class="btn btn-sm btn-outline-dark ms-2" (click)="loadCatalog()">Réessayer</button>
+  </div>
+
+  <!-- Liste des produits -->
+  <ng-container *ngIf="!loading && !loadError">
+    <p class="text-muted small mb-2">{{ filteredProducts.length }} produit(s)</p>
+    <div class="row" *ngIf="filteredProducts.length > 0; else notFound">
+      <div *ngFor="let product of filteredProducts" class="col-lg-3 col-md-4 col-sm-6">
+        <div class="card my-2 shadow-sm product-card h-100">
+          <img [src]="product.imageUrl" class="card-img-top" [alt]="product.name" loading="lazy" />
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ product.price | currency }}</h5>
+            <p class="card-text mb-1">{{ product.name }}</p>
+            <p class="card-text text-muted small mb-2">{{ product.category.name }}</p>
+            <p class="small mb-2" [ngClass]="product.stock > 5 ? 'text-success' : product.stock > 0 ? 'text-warning' : 'text-danger'">
+              <ng-container *ngIf="product.stock > 0; else outOfStock">{{ product.stock }} en stock</ng-container>
+              <ng-template #outOfStock>Rupture de stock</ng-template>
+            </p>
+            <div class="mt-auto text-center">
+              <button type="button" (click)="addToCart(product)" class="btn btn-primary btn-sm w-100"
+                      [disabled]="product.stock === 0">
+                <i class="fa-solid fa-cart-plus me-1"></i> Ajouter au panier
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div> -->
-
-
-  <hr />
-
-  <!-- Pagination -->
-  <!-- <nav aria-label="Page navigation example" class="d-flex justify-content-center mt-3">
-    <ul class="pagination">
-      <li class="page-item disabled">
-        <a class="page-link" href="#" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-      <li class="page-item active"><a class="page-link" href="#">1</a></li>
-      <li class="page-item"><a class="page-link" href="#">2</a></li>
-      <li class="page-item"><a class="page-link" href="#">3</a></li>
-      <li class="page-item"><a class="page-link" href="#">4</a></li>
-      <li class="page-item"><a class="page-link" href="#">5</a></li>
-      <li class="page-item">
-        <a class="page-link" href="#" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-    </ul>
-  </nav> -->
-  <!-- Pagination -->
-
-<!-- list of products -->
-
+    </div>
+    <ng-template #notFound>
+      <div class="text-center py-5">
+        <h2 class="h4">Aucun produit trouvé</h2>
+        <button class="btn btn-link" (click)="resetFilters()">Réinitialiser les filtres</button>
+      </div>
+    </ng-template>
+  </ng-container>
 </div>
-
-
-

@@ -1,11 +1,12 @@
-import { Category } from "./Category";
+import { Category } from './Category';
 
-export interface Product{
-    id: number;
-    code:string,
-    name:string,
-    quantity:number,
-    price:number,
-    img_url:string,
-    category:Category
+/** Produit du catalogue. `stock` = quantité disponible en magasin. */
+export interface Product {
+  id: number;
+  code: string;
+  name: string;
+  stock: number;
+  price: number;
+  imageUrl: string;
+  category: Category;
 }

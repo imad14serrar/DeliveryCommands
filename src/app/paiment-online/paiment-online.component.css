@@ -1,16 +1,9 @@
-.form-title{
-  font-weight:600;
+.form-title {
+  font-weight: 600;
 }
 
-.card-modification{
-  background-color: white;
-}
-
-.elemet-position{
-  display: flex;
+.card-type {
+  min-width: 90px;
   justify-content: center;
-}
-.card-type{
-  height: 100%;
-  border-radius: 0;
+  font-size: 0.85rem;
 }

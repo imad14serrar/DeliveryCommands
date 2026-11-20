@@ -1,19 +1,43 @@
-
-.notification-dropdown {
-  display: none;
+.website-name {
+  font-size: 1.6rem;
+  font-weight: 700;
 }
 
-.notification-dropdown[hidden] {
-  display: block;
+.navbar-item li {
+  font-size: 1.1rem;
+  font-weight: 500;
 }
 
-.website-name{
-  font-size: 30px !important;
-  font-weight: bolder ! important;
-}
-.navbar-item li{
-  font-size: 20px !important;
-  font-weight:500;
+.nav-link.active {
+  text-decoration: underline;
+  text-underline-offset: 6px;
 }
 
+.cart-link {
+  font-size: 1.3rem;
+}
 
+.cart-badge {
+  position: absolute;
+  top: 0;
+  right: -6px;
+  font-size: 0.7rem;
+}
+
+/* Barre de chargement fine sous la navbar pendant les requêtes HTTP */
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  z-index: 2000;
+  background: linear-gradient(90deg, transparent, #ffc107, transparent);
+  background-size: 50% 100%;
+  animation: loading 1s linear infinite;
+}
+
+@keyframes loading {
+  from { background-position: -50% 0; }
+  to { background-position: 150% 0; }
+}

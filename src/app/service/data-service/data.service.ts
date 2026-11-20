@@ -1,82 +1,44 @@
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Product } from 'src/app/data-interfaces/Product';
+import { environment } from 'src/environments/environment';
 import { Category } from 'src/app/data-interfaces/Category';
+import { Product } from 'src/app/data-interfaces/Product';
+import { CreateShipmentRequest, Shipment, Tracking } from 'src/app/data-interfaces/Shipment';
 import { ShipmentType } from 'src/app/data-interfaces/ShipmentType';
-import { Shipment } from 'src/app/data-interfaces/Shipment';
-import { ProductDto } from 'src/app/data-interfaces/ProductDto';
+import { SKIP_ERROR_TOAST } from 'src/app/interceptors/error.interceptor';
 
+/** Appels HTTP publics vers l'API (catalogue, création et suivi de commande). */
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
+  private readonly apiUrl = environment.apiUrl;
 
+  constructor(private http: HttpClient) {}
 
-  bodyToSend:{code:string,fname:string,lname:string,tel:string,address:string,city:string,postalCode:string,zip:string,email:string,status:string,shipmentType:string,products:ProductDto[],paiement:{}}={code:"",fname:"",lname:"",tel:"",address:"",city:"",postalCode:"",zip:"",email:"",status:"",shipmentType:"",products:[],paiement:{}};
-
-  // {
-  //   "code": "SHIP001",
-  //   "fname": "John",
-  //   "lname": "Doe",
-  //   "tel": "123456789",
-  //   "address": "123 Main Street",
-  //   "city": "Cityville",
-  //   "postalCode": "12345",
-  //   "zip": "67890",
-  //   "status": "Pending",
-  //   "shipmentType": 1,
-  //   "products": [
-  //     {
-  //       "id": 1,
-  //       "quantity": 3
-  //     },
-  //     {
-  //       "id": 2,
-  //       "quantity": 2
-  //     },
-  //     {
-  //       "id": 3,
-  //       "quantity": 1
-  //     }
-  //   ],
-  //   "paiement": {
-  //     "code": "PAY001",
-  //     "productsTotal": 100.0,
-  //     "discountValue": 10.0,
-  //     "shipmentPrice": 5.0
-  //   }
-  // }
-
-  constructor(private http:HttpClient) { }
-
-  private hostUrl='https://livraison.onrender.com';
-  private productsUrl=`${this.hostUrl}/api/products`;
-  private categoriesUrl=`${this.hostUrl}/api/categories`;
-  private shipmentTypesUrl=`${this.hostUrl}/api/shipment-types`;
-  private shipmentUrl=`${this.hostUrl}/api/shipments`;
-
-  httpOptions = {
-    headers: new HttpHeaders({'Content-Type':'application/json'})
+  getProducts(): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/products`);
   }
 
-  getProducts():Observable<Product[]>{
-    return this.http.get<Product[]>(this.productsUrl);
+  getCategories(): Observable<Category[]> {
+    return this.http.get<Category[]>(`${this.apiUrl}/categories`);
   }
-  getCategories():Observable<Category[]>{
-    return this.http.get<Category[]>(this.categoriesUrl);
+
+  getShipmentTypes(): Observable<ShipmentType[]> {
+    return this.http.get<ShipmentType[]>(`${this.apiUrl}/shipment-types`);
   }
-  getShipmentTypes():Observable<ShipmentType[]>{
-    return this.http.get<ShipmentType[]>(this.shipmentTypesUrl);
+
+  createShipment(request: CreateShipmentRequest): Observable<Shipment> {
+    return this.http.post<Shipment>(`${this.apiUrl}/shipments`, request);
   }
-  getShipment(code:string):Observable<Shipment>{
-    return this.http.get<Shipment>(this.shipmentUrl+`/${code}`);
-  }
-  createShipment(bodyToSend:any){
-    return this.http.post(this.shipmentUrl+`/add`,bodyToSend,this.httpOptions);
-  }
-  getShipmentCostByCode(code: string): Observable<number> {
-    const url = `${this.hostUrl}/api/shipments/${code}`;
-    return this.http.get<number>(url);
+
+  /** Le message « introuvable » est affiché dans la page, d'où SKIP_ERROR_TOAST. */
+  trackShipment(code: string, email: string): Observable<Tracking> {
+    const params = new HttpParams().set('code', code).set('email', email);
+    return this.http.get<Tracking>(`${this.apiUrl}/shipments/track`, {
+      params,
+      context: new HttpContext().set(SKIP_ERROR_TOAST, true)
+    });
   }
 }

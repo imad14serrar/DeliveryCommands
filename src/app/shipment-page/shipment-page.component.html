@@ -1,146 +1,107 @@
 <section class="bg-light py-5">
-    <div class="container">
-      <div class="row">
-        <div class="col-xl-8 col-lg-8 mb-4">
-          <!-- Checkout -->
-          <div class="card shadow-0 border">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mb-4">
+        <form class="card shadow-sm border" [formGroup]="form" (ngSubmit)="submit()" novalidate>
           <div class="p-4">
-              <h5 class="card-title mb-3">Checkout</h5>
-              <div class="row">
-                <div class="col-6 mb-3">
-                    <p class="mb-0">First name</p>
-                    <div class="form-outline">
-                    <input type="text" id="typeText" [(ngModel)]="firstname" placeholder="Type here" class="form-control" />
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <p class="mb-0">Last name</p>
-                    <div class="form-outline">
-                    <input type="text" id="typeText" [(ngModel)]="lastname"  placeholder="Type here" class="form-control" />
-                    </div>
-                </div>
-
-                <div class="col-6 mb-3">
-                  <p class="mb-0">Phone</p>
-                  <div class="form-outline">
-                    <input type="tel" id="typePhone" [(ngModel)]="telephone" class="form-control" pattern="^0\d{9}$" required />
-                  </div>
-                  <div *ngIf="!phoneRegex.test(telephone) && telephone">
-                    Format de numéro de téléphone n'est pas valide
-                  </div>
-                </div>
-
-                <div class="col-6 mb-3">
-                  <p class="mb-0">Email</p>
-                  <div class="form-outline">
-                    <input type="email" id="typeEmail" [(ngModel)]="email" class="form-control" pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" required />
-                  </div>
-                  <div *ngIf="!emailRegex.test(email) && email">
-                    E-mail est erroné
-                  </div>
-                </div>
+            <h1 class="h5 card-title mb-3">Vos coordonnées</h1>
+            <div class="row">
+              <div class="col-sm-6 mb-3">
+                <label for="firstName" class="form-label mb-0">Prénom</label>
+                <input id="firstName" type="text" formControlName="firstName" class="form-control"
+                       [class.is-invalid]="showError('firstName')" autocomplete="given-name" />
+                <div class="invalid-feedback">Le prénom est obligatoire.</div>
               </div>
-
-              <!-- <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
-                <label class="form-check-label" for="flexCheckDefault">Keep me up to date on news</label>
-              </div> -->
-
-              <hr class="my-4" />
-
-              <h5 class="card-title mb-3">Shipping info</h5>
-
-              <div class="row mb-3">
-              <div *ngFor="let shipmentType of shipmentTypes" class="col-lg-4 mb-3">
-                  <div class="form-check h-100 border rounded-3">
-
-                  <div class="p-3">
-                      <!-- [checked]="shipmentType.name === 'express delivery'" -->
-                      <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadio{{shipmentType.code}}" (change)="selectShipment(shipmentType.code)" [checked]="shipmentType.name === 'express delivery'" />
-                      <label class="form-check-label" for="flexRadio{{shipmentType.code}}">
-                      {{shipmentType.name | titlecase}} <br />
-                      <small class="text-muted">{{shipmentType.description}} </small>
-                      </label>
-                  </div>
-                  </div>
+              <div class="col-sm-6 mb-3">
+                <label for="lastName" class="form-label mb-0">Nom</label>
+                <input id="lastName" type="text" formControlName="lastName" class="form-control"
+                       [class.is-invalid]="showError('lastName')" autocomplete="family-name" />
+                <div class="invalid-feedback">Le nom est obligatoire.</div>
               </div>
+              <div class="col-sm-6 mb-3">
+                <label for="phone" class="form-label mb-0">Téléphone</label>
+                <input id="phone" type="tel" formControlName="phone" class="form-control" placeholder="06XXXXXXXX"
+                       [class.is-invalid]="showError('phone')" autocomplete="tel" />
+                <div class="invalid-feedback">10 chiffres commençant par 0 (ex. : 0612345678).</div>
               </div>
-
-              <div class="row">
-                <div class="col-sm-8 mb-3">
-                    <p class="mb-0">Address</p>
-                    <div class="form-outline">
-                    <input type="text" id="typeText" [(ngModel)]="address" placeholder="Type here" class="form-control" />
-                    </div>
-                </div>
-
-                <div class="col-sm-4 mb-3">
-                    <p class="mb-0">City</p>
-                    <select class="form-select" [(ngModel)]="city">
-                    <option value="Marrakech">Marrakech</option>
-                    <option value="Casablanca">Casablanca</option>
-                    <option value="Rabat">Rabat</option>
-                    </select>
-                </div>
-
-                <!-- <div class="col-sm-4 mb-3">
-                    <p class="mb-0">House</p>
-                    <div class="form-outline">
-                    <input type="text" id="typeText" placeholder="Type here" class="form-control" />
-                    </div>
-                </div> -->
-
-                <div class="col-sm-6 col-6 mb-3">
-                  <p class="mb-0">Postal code</p>
-                  <div class="form-outline">
-                  <input type="text" id="typeText" [(ngModel)]="postalCode" class="form-control" pattern="^\d{5}$" required/>
-                  </div>
-                  <div *ngIf="!postalCodeRegex.test(postalCode) && postalCode">
-                    Postal code est erroné
-                  </div>
+              <div class="col-sm-6 mb-3">
+                <label for="email" class="form-label mb-0">E-mail</label>
+                <input id="email" type="email" formControlName="email" class="form-control"
+                       [class.is-invalid]="showError('email')" autocomplete="email" />
+                <div class="invalid-feedback">Adresse e-mail invalide.</div>
+                <div class="form-text">Elle vous sera demandée pour suivre votre commande.</div>
               </div>
-
-              <div class="col-sm-6 col-6 mb-3">
-                  <p class="mb-0">Zip</p>
-                  <div class="form-outline">
-                  <input type="text" id="typeText" [(ngModel)]="zip" class="form-control" pattern="^\d{5}$" required/>
-                  </div>
-                  <div *ngIf="!zipRegex.test(zip) && zip">
-                    Zip est erroné
-                  </div>
-              </div>
-              </div>
-
-              <div class="float-end">
-                <button class="btn btn-light border" (click)="backtoCart()">Cancel</button>
-                <button class="btn btn-primary shadow-0 border mx-2" (click)="submitShipment()">Continue</button>
-              </div>
-          </div>
-          </div>
-          <!-- Checkout -->
-        </div>
-        <div class="col-xl-4 col-lg-4 d-flex justify-content-center ">
-            <div class="ms-lg-4 mt-4 mt-lg-0" style="max-width: 320px;">
-                <h6 class="text-center mb-3">Summary</h6>
-                <div class="d-flex justify-content-between">
-                    <p class="mb-2">products price:</p>
-                    <p class="mb-2">${{totalPrice}}</p>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <p class="mb-2">Shipping cost:</p>
-                    <p class="mb-2">${{shipmentCost}}</p>
-                </div>
-                <hr />
-                <div class="d-flex justify-content-between">
-                    <p class="mb-2">Total price:</p>
-                    <p class="mb-2 fw-bold">${{total}}</p>
-                </div>
-
-                <hr />
             </div>
-        </div>
+
+            <hr class="my-4" />
+
+            <h2 class="h5 card-title mb-3">Mode de livraison</h2>
+            <div class="row mb-3">
+              <div *ngFor="let type of shipmentTypes" class="col-lg-4 mb-3">
+                <label class="form-check h-100 border rounded-3 p-3 ps-5 shipment-option"
+                       [class.border-primary]="form.controls.shipmentTypeCode.value === type.code">
+                  <input class="form-check-input" type="radio" formControlName="shipmentTypeCode" [value]="type.code" />
+                  <span class="fw-semibold d-block">{{ type.name }}</span>
+                  <small class="text-muted d-block">{{ type.description }}</small>
+                  <small class="d-block mt-1">{{ type.price > 0 ? (type.price | currency) : 'Gratuit' }}</small>
+                </label>
+              </div>
+            </div>
+
+            <h2 class="h5 card-title mb-3">Adresse de livraison</h2>
+            <div class="row">
+              <div class="col-sm-8 mb-3">
+                <label for="address" class="form-label mb-0">Adresse</label>
+                <input id="address" type="text" formControlName="address" class="form-control"
+                       [class.is-invalid]="showError('address')" autocomplete="street-address" />
+                <div class="invalid-feedback">L'adresse est obligatoire.</div>
+              </div>
+              <div class="col-sm-4 mb-3">
+                <label for="city" class="form-label mb-0">Ville</label>
+                <select id="city" class="form-select" formControlName="city" [class.is-invalid]="showError('city')">
+                  <option value="" disabled>Choisir…</option>
+                  <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+                </select>
+                <div class="invalid-feedback">Choisissez une ville.</div>
+              </div>
+              <div class="col-sm-4 mb-3">
+                <label for="postalCode" class="form-label mb-0">Code postal</label>
+                <input id="postalCode" type="text" inputmode="numeric" formControlName="postalCode" class="form-control"
+                       [class.is-invalid]="showError('postalCode')" autocomplete="postal-code" />
+                <div class="invalid-feedback">5 chiffres (ex. : 40000).</div>
+              </div>
+            </div>
+
+            <div *ngIf="submitted && form.invalid" class="alert alert-danger py-2">
+              Veuillez corriger les champs signalés en rouge.
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+              <a routerLink="/panier" class="btn btn-light border">Retour au panier</a>
+              <button type="submit" class="btn btn-primary">Continuer vers le paiement</button>
+            </div>
+          </div>
+        </form>
       </div>
+
+      <aside class="col-lg-4">
+        <div class="card shadow-sm border p-4">
+          <h2 class="h6 text-center mb-3">Récapitulatif</h2>
+          <div class="d-flex justify-content-between">
+            <p class="mb-2">Produits :</p>
+            <p class="mb-2">{{ productsTotal | currency }}</p>
+          </div>
+          <div class="d-flex justify-content-between">
+            <p class="mb-2">Livraison :</p>
+            <p class="mb-2">{{ shippingCost | currency }}</p>
+          </div>
+          <hr />
+          <div class="d-flex justify-content-between">
+            <p class="mb-0">Total :</p>
+            <p class="mb-0 fw-bold">{{ total | currency }}</p>
+          </div>
+        </div>
+      </aside>
     </div>
-  </section>
+  </div>
+</section>

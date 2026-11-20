@@ -1,0 +1,33 @@
+.stat-card {
+  border-left: 4px solid #0d6efd;
+}
+
+.stat-label {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #6c757d;
+  letter-spacing: 0.03em;
+}
+
+.stat-value {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.search-box {
+  max-width: 280px;
+}
+
+.order-row {
+  cursor: pointer;
+}
+
+.status-select {
+  min-width: 150px;
+}
+
+.details-row td {
+  background: #f8f9fa;
+}

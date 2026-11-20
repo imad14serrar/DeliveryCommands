@@ -1,6 +1,7 @@
-export interface ShipmentType{
-    code:string,
-    name:string,
-    description:string,
-    price:number
+export interface ShipmentType {
+  id: number;
+  code: string;
+  name: string;
+  description: string;
+  price: number;
 }

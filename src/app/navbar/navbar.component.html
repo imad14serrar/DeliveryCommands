@@ -1,27 +1,39 @@
-<nav class="navbar navbar-dark bg-primary navbar-expand-lg ">
+<nav class="navbar navbar-dark bg-primary navbar-expand-lg sticky-top">
   <div class="container">
-    <a class="navbar-brand website-name" href="#"><i class="fa-solid fa-store me-2"></i>OurShop</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <a class="navbar-brand website-name" routerLink="/produits">
+      <i class="fa-solid fa-truck-fast me-2"></i>{{ shopName }}
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+            aria-controls="mainNav" aria-expanded="false" aria-label="Afficher le menu">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 navbar-item">
-        <!-- <li class="nav-item me-3">
-          <a class="nav-link " href="#">Home</a>
-        </li> -->
-        <li class="nav-item me-3">
-          <a class="nav-link" routerLink="product-list">Shop</a>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center navbar-item">
+        <li class="nav-item me-lg-3">
+          <a class="nav-link" routerLink="/produits" routerLinkActive="active">Boutique</a>
         </li>
-        <li class="nav-item me-3">
-          <a class="nav-link" routerLink="trafic-orders">Order Tracking</a>
+        <li class="nav-item me-lg-3">
+          <a class="nav-link" routerLink="/suivi" routerLinkActive="active">Suivi de commande</a>
         </li>
-        <li class="nav-item me-3">
-          <a class="nav-link" routerLink="contact-us">Contact Us</a>
+        <li class="nav-item me-lg-3">
+          <a class="nav-link" routerLink="/contact" routerLinkActive="active">Contact</a>
         </li>
-        <li class="nav-item me-3">
-          <a class="nav-link" routerLink="cart"><fa-icon [icon]="faCartShopping"></fa-icon></a>
+        <li class="nav-item me-lg-3">
+          <a class="nav-link" routerLink="/admin" routerLinkActive="active" title="Espace administrateur">
+            <i class="fa-solid fa-user-shield"></i>
+            <span class="d-lg-none ms-2">Espace admin</span>
+          </a>
         </li>
-     </ul>
+        <li class="nav-item">
+          <a class="nav-link position-relative cart-link" routerLink="/panier" routerLinkActive="active"
+             [attr.aria-label]="'Panier : ' + ((cartCount$ | async) ?? 0) + ' article(s)'">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span *ngIf="(cartCount$ | async) as count" class="badge rounded-pill bg-danger cart-badge">{{ count }}</span>
+            <span class="d-lg-none ms-2">Panier</span>
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
 </nav>
+<div class="loading-bar" *ngIf="loading$ | async" role="progressbar" aria-label="Chargement en cours"></div>

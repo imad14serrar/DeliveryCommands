@@ -1,70 +1,75 @@
 import { Component, OnInit } from '@angular/core';
-import { DataService } from '../service/data-service/data.service';
-import { Product } from '../data-interfaces/Product';
+import { ToastrService } from 'ngx-toastr';
 import { Category } from '../data-interfaces/Category';
+import { Product } from '../data-interfaces/Product';
 import { CartService } from '../service/cart-service/cart.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { FormBuilder } from '@angular/forms';
-
+import { DataService } from '../service/data-service/data.service';
 
 @Component({
   selector: 'app-product-list',
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent {
-  searchTerm: string = "";
-  products:Product[]=[];
-  categories:Category[]=[];
+export class ProductListComponent implements OnInit {
+  searchTerm = '';
+  selectedCategory = ''; // '' = toutes les catégories
+  products: Product[] = [];
+  categories: Category[] = [];
   filteredProducts: Product[] = [];
-  selectedCategory: string = "Categories";
+  loading = true;
+  loadError = false;
 
-  constructor(private dataService:DataService, private cartService : CartService,private snackBar: MatSnackBar){}
-  addToCart(product: Product) {
-    // Check if the product is already in the cart
-    if (!this.cartService.isProductInCart(product)) {
-      this.cartService.addToCart(product);
-      this.snackBar.open('Product added to the cart!', 'Close', {
-        duration: 1000, // Duration in milliseconds
-      });
-    } else {
-      this.snackBar.open('Product is already in the cart!', 'Close', {
-        duration: 1000, // Duration in milliseconds
-      });
-    }
+  constructor(private dataService: DataService, private cartService: CartService, private toastr: ToastrService) {}
+
+  ngOnInit(): void {
+    this.loadCatalog();
   }
 
-
-  ngOnInit():void{
-    this.dataService.getProducts().subscribe(products=>{
-      // console.log(products)
-      this.products=products;
-      this.filteredProducts=products
-    })
-    this.dataService.getCategories().subscribe(categories=>{
-      // console.log(categories)
-      this.categories=categories;
-    })
-
-
+  loadCatalog(): void {
+    this.loading = true;
+    this.loadError = false;
+    this.dataService.getProducts().subscribe({
+      next: products => {
+        this.products = products;
+        this.filterProducts();
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.loadError = true;
+      }
+    });
+    this.dataService.getCategories().subscribe(categories => (this.categories = categories));
   }
+
   filterProducts(): void {
-
-    this.filteredProducts = this.products;
-
-    // Filter by search term
-    if (this.searchTerm.trim() !== "") {
-      this.filteredProducts = this.filteredProducts.filter(product =>
-        product.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
-
-    // Filter by category
-    if (this.selectedCategory && this.selectedCategory !== "Categories") {
-      this.filteredProducts = this.filteredProducts.filter(product =>
-        product.category.code === this.selectedCategory
-      );
-    }
+    const term = this.searchTerm.trim().toLowerCase();
+    this.filteredProducts = this.products.filter(p =>
+      (!term || p.name.toLowerCase().includes(term)) &&
+      (!this.selectedCategory || p.category.code === this.selectedCategory)
+    );
   }
 
+  resetFilters(): void {
+    this.searchTerm = '';
+    this.selectedCategory = '';
+    this.filterProducts();
+  }
+
+  addToCart(product: Product): void {
+    switch (this.cartService.add(product)) {
+      case 'added':
+        this.toastr.success(`« ${product.name} » a été ajouté au panier.`);
+        break;
+      case 'incremented':
+        this.toastr.info(`Quantité de « ${product.name} » augmentée.`);
+        break;
+      case 'max-stock':
+        this.toastr.warning(`Stock maximum atteint pour « ${product.name} ».`);
+        break;
+      case 'out-of-stock':
+        this.toastr.warning('Ce produit est en rupture de stock.');
+        break;
+    }
+  }
 }

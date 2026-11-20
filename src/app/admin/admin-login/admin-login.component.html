@@ -1,0 +1,29 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-sm-8 col-md-5 col-lg-4">
+      <div class="card shadow-sm p-4">
+        <div class="text-center mb-3">
+          <i class="fa-solid fa-user-shield fa-2x text-primary"></i>
+          <h1 class="h4 mt-2">Espace administrateur</h1>
+        </div>
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="mb-3">
+            <label for="username" class="form-label">Identifiant</label>
+            <input id="username" type="text" class="form-control" formControlName="username" autocomplete="username"
+                   [class.is-invalid]="form.controls.username.invalid && form.controls.username.touched">
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Mot de passe</label>
+            <input id="password" type="password" class="form-control" formControlName="password"
+                   autocomplete="current-password"
+                   [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched">
+          </div>
+          <div *ngIf="error" class="alert alert-danger py-2 small">{{ error }}</div>
+          <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>Se connecter
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

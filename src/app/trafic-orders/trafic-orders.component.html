@@ -1,63 +1,48 @@
-<div class="container px-1 px-md-4 py-4 mt-4 mx-auto">
-    <h2> Your order tracking</h2>
-    <div class="container">
-        <div class="d-flex justify-content-center align-items-center mt-5 ">
-          <div class="col-md-8">
-            <div class="search d-flex flex-row">
-              <input type="text" class="form-control mx-3 " [(ngModel)]="code" placeholder="Enter your Order ID">
-              <button (click)="getShipment()" class="btn btn-primary">Search</button>
-            </div>
-          </div>
-        </div>
+<div class="container px-1 px-md-4 py-4 mt-2 mx-auto">
+  <h1 class="h3 text-center">Suivi de commande</h1>
+  <p class="text-center text-muted">Saisissez le code reçu après votre commande et l'e-mail utilisé.</p>
+
+  <form class="row g-2 justify-content-center mt-3" [formGroup]="form" (ngSubmit)="search()" novalidate>
+    <div class="col-md-4">
+      <label for="code" class="visually-hidden">Code de commande</label>
+      <input id="code" type="text" class="form-control text-uppercase" formControlName="code"
+             placeholder="CMD-20261120-XXXXXX"
+             [class.is-invalid]="form.controls.code.invalid && form.controls.code.touched">
+    </div>
+    <div class="col-md-4">
+      <label for="email" class="visually-hidden">E-mail</label>
+      <input id="email" type="email" class="form-control" formControlName="email" placeholder="Votre e-mail"
+             [class.is-invalid]="form.controls.email.invalid && form.controls.email.touched">
+    </div>
+    <div class="col-md-2 d-grid">
+      <button type="submit" class="btn btn-primary" [disabled]="searching">
+        <span *ngIf="searching" class="spinner-border spinner-border-sm me-1"></span>Rechercher
+      </button>
+    </div>
+  </form>
+
+  <div *ngIf="error" class="alert alert-warning text-center mt-4 mx-auto col-md-8">{{ error }}</div>
+
+  <div class="card tracking-card mt-4 mx-auto col-lg-10" *ngIf="tracking as t">
+    <div class="d-flex flex-wrap justify-content-between px-4 pt-4 gap-2">
+      <div>
+        <h2 class="h5 mb-1">Commande <span class="text-primary fw-bold">{{ t.code }}</span></h2>
+        <p class="mb-0 small text-muted">
+          Passée le {{ t.orderDate | date: 'longDate' }} · {{ t.itemCount }} article(s) · {{ t.total | currency }}
+        </p>
+      </div>
+      <div class="text-sm-end small">
+        <p class="mb-0"><strong>{{ t.shipmentType.name }}</strong> — {{ t.shipmentType.description }}</p>
+        <p class="mb-0 text-muted">Livraison à {{ t.city }} · mis à jour le {{ t.updatedAt | date: 'short' }}</p>
+      </div>
     </div>
 
-    <div class="card mt-4 bg-white" *ngIf="shipment.code && shipment.fname">
-        <div class="row d-flex justify-content-between px-3 top m-0">
-            <div class="d-flex">
-                <h5>ORDER <span class="text-primary font-weight-bold">{{shipment.code}}</span></h5>
-            </div>
-            <div class="d-flex flex-column text-sm-right">
-                <p class="mb-0">Expected Arrival <span>01/12/19</span></p>
-                <!-- <p>USPS <span class="font-weight-bold">234094567242423422898</span></p> -->
-            </div>
-        </div>
-        <!-- Add class 'active' to progress -->
-        <div class=" d-flex flex-column justify-content-center m-0 ">
-            <div class="col-12">
-            <ul id="progressbar" class="text-center">
-                <li class="step0" [ngClass]="{'active': shipment.status==='order processed' || shipment.status==='order shipped' || shipment.status==='order on the way' || shipment.status==='order arrived'}"></li>
-                <li class="step0" [ngClass]="{'active': shipment.status==='order shipped' || shipment.status==='order on the way' || shipment.status==='order arrived'}"></li>
-                <li class="step0" [ngClass]="{'active': shipment.status==='order on the way' || shipment.status==='order arrived'}"></li>
-                <li class="step0" [ngClass]="{'active': shipment.status==='order arrived'}"></li>
-            </ul>
-            <div class="d-flex justify-content-around ">
-              <div class="  icon-content">
-                  <img class="icon" src="../../assets/order-processing.jpeg">
-                  <div class="">
-                      <p class="font-weight-bold">Order<br>Processed</p>
-                  </div>
-              </div>
-              <div class="icon-content">
-                  <img class="icon" src="../../assets/orderShipped.jpg">
-                  <div class="d-flex flex-column">
-                      <p class="font-weight-bold">Order<br>Shipped</p>
-                  </div>
-              </div>
-              <div class=" icon-content">
-                  <img class="icon" src="../../assets/orderEnRoute.jpg">
-                  <div class="d-flex flex-column">
-                      <p class="font-weight-bold">Order<br>En Route</p>
-                  </div>
-              </div>
-              <div class=" icon-content ">
-                  <img class="icon" src="../../assets/orderArrived.jpg">
-                  <div class="d-flex flex-column">
-                      <p class="font-weight-bold">Order<br>Arrived</p>
-                  </div>
-              </div>
-          </div>
-            </div>
-        </div>
-
-    </div>
+    <ol class="steps list-unstyled d-flex justify-content-between px-3 px-md-5 my-4">
+      <li *ngFor="let step of steps; let i = index" class="step text-center" [class.reached]="isReached(i)">
+        <span class="step-dot"><i class="fa-solid" [ngClass]="isReached(i) ? 'fa-check' : 'fa-circle'"></i></span>
+        <img class="icon d-none d-sm-block mx-auto mt-2" [src]="step.image" alt="">
+        <p class="fw-semibold small mt-2 mb-0">{{ step.label }}</p>
+      </li>
+    </ol>
+  </div>
 </div>

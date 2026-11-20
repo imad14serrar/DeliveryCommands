@@ -1,19 +1,27 @@
 .search-label {
-  width: 350px !important;
+  width: 350px;
+  max-width: 100%;
 }
-.mat-snack-bar-container {
-  background-color: #333;
-  color: #fff;
-}  
-@media (max-width:768px) {
 
-  .product-filter{
-    gap: 10px;
+.product-card img {
+  height: 220px;
+  object-fit: contain;
+  padding: 0.75rem;
+  background: #fff;
+}
 
+.product-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12) !important;
+}
+
+@media (max-width: 576px) {
+  .search-label,
+  .select-category {
+    width: 100%;
   }
-  .search-label{
-    margin-right: 0px!important;
-    margin-left: 0px!important;
-  }
-
 }

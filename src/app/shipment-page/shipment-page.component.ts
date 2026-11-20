@@ -1,145 +1,89 @@
-import { Location } from '@angular/common';
-import { Component, Input } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { CartComponent } from '../cart/cart.component';
-import { Product } from '../data-interfaces/Product';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ShippingInfo } from '../data-interfaces/Shipment';
 import { ShipmentType } from '../data-interfaces/ShipmentType';
-import { PaiementDto } from '../data-interfaces/paiemetDto';
+import { CartService } from '../service/cart-service/cart.service';
+import { CheckoutService } from '../service/checkout-service/checkout.service';
 import { DataService } from '../service/data-service/data.service';
+import { PHONE_PATTERN, POSTAL_CODE_PATTERN } from '../shared/validators';
 
+export const CITIES = ['Agadir', 'Casablanca', 'Fès', 'Marrakech', 'Meknès', 'Oujda', 'Rabat', 'Tanger', 'Tétouan'];
+
+/** Étape 2 du tunnel : informations de livraison et choix du mode de livraison. */
 @Component({
   selector: 'app-shipment-page',
   templateUrl: './shipment-page.component.html',
   styleUrls: ['./shipment-page.component.css']
 })
-export class ShipmentPageComponent {
+export class ShipmentPageComponent implements OnInit {
+  readonly cities = CITIES;
+  shipmentTypes: ShipmentType[] = [];
+  submitted = false;
 
-  totalPrice:number=0;
-  shipmentCost:number=14;
-  total: number = 0;
-  products: Product[] = [];
-  firstname: string = "";
-  lastname:string="";
-  telephone:string="";
-  address:string="";
-  city:string="";
-  postalCode:string="";
-  zip:string="";
-  orderDate:string="";
-  status:string="";
-  email:string="";
+  readonly form = this.fb.nonNullable.group({
+    firstName: ['', [Validators.required, Validators.maxLength(60)]],
+    lastName: ['', [Validators.required, Validators.maxLength(60)]],
+    phone: ['', [Validators.required, Validators.pattern(PHONE_PATTERN)]],
+    email: ['', [Validators.required, Validators.email]],
+    address: ['', [Validators.required, Validators.maxLength(200)]],
+    city: ['', Validators.required],
+    postalCode: ['', [Validators.required, Validators.pattern(POSTAL_CODE_PATTERN)]],
+    shipmentTypeCode: ['', Validators.required]
+  });
 
-  shipmentTypes:ShipmentType[]=[];
-  shipmentSelectedCode:string="S-001";
-  shipmentSelectedId=0
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private dataService: DataService,
+    private cart: CartService,
+    private checkout: CheckoutService
+  ) {}
 
-
-  phoneRegex = /^0\d{9}$/;
-  emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-  postalCodeRegex =/^\d{5}$/;
-  zipRegex = /^\d{5}$/;
-
-  registerBody = { tel: '', email: '', postalCode: '', zip: '' };
-
-
-
-  constructor(private router:Router,private dataService:DataService,private route:ActivatedRoute,private toastr: ToastrService){}
-
-
-  ngOnInit(){
-    this.dataService.getShipmentTypes().subscribe(shipmentTypes=>{
-      // console.log(shipmentTypes);
-      this.shipmentTypes=shipmentTypes;
-    })
-    if(!history.state.totalPrice || !history.state.products){
-      this.router.navigate(['/']);
-    } else {
-      this.totalPrice = history.state.totalPrice;
-      this.products = history.state.products;
-
-      this.products.forEach((product) => {
-        this.dataService.bodyToSend.products.push({
-          id: product.id,
-          quantity: product.quantity
-        });
-      });
-
-      this.calculateTotalPrice();
+  ngOnInit(): void {
+    // Retour depuis la page de paiement : on pré-remplit le formulaire.
+    if (this.checkout.shipping) {
+      this.form.patchValue(this.checkout.shipping);
     }
-
-
-
-
-  }
-  calculateTotalPrice(): void {
-    this.total=this.totalPrice+this.shipmentCost;
- }
-
- validateForm() {
-  if (!this.phoneRegex.test(this.registerBody.tel)) {
-    this.toastr.error("Format de numéro de téléphone n'est pas valide");
-    return;
-  }
-  if (!this.emailRegex.test(this.registerBody.email)) {
-    this.toastr.error("E-mail est erroné");
-    return;
-  }
-  if (!this.postalCodeRegex.test(this.registerBody.postalCode)) {
-    this.toastr.error("Le code postal est invalide");
-    return;
-  }
-  if (!this.zipRegex.test(this.registerBody.zip)) {
-    this.toastr.error("Le code ZIP est invalide");
-    return;
-  }
-}
- submitShipment() {
-  if (this.firstname.length === 0 ||
-      this.lastname.length === 0 ||
-      this.telephone.length === 0 ||
-      this.address.length === 0 ||
-      this.city.length === 0 ||
-      this.postalCode.length === 0 ||
-
-      this.zip.length === 0  ) {
-    console.log("Please fill in all form fields");
-  } else {
-    this.dataService.bodyToSend.fname = this.firstname;
-    this.dataService.bodyToSend.lname = this.lastname;
-    this.dataService.bodyToSend.tel = this.telephone;
-    this.dataService.bodyToSend.address = this.address;
-    this.dataService.bodyToSend.city = this.city;
-    this.dataService.bodyToSend.postalCode = this.postalCode;
-    this.dataService.bodyToSend.email = this.email;;
-    this.dataService.bodyToSend.zip = this.zip;
-    this.dataService.bodyToSend.shipmentType = this.shipmentSelectedCode
-    this.dataService.bodyToSend.paiement = {
-      code: "",
-      discountValue: this.totalPrice,
-      shipmentPrice: this.shipmentCost,
-      productsTotal: this.total
-    };
-
-
-    console.log(this.dataService.bodyToSend);
-    this.router.navigate(['/paiement-online']);
-  }
-}
-
-
-  selectShipment(code:any){
-    let selectedShipment = this.shipmentTypes.find((shipmentType)=>shipmentType.code===code)
-    this.shipmentSelectedCode = code;
-    this.shipmentCost=selectedShipment?.price||0
-    this.total=this.totalPrice+this.shipmentCost
+    this.dataService.getShipmentTypes().subscribe(types => {
+      this.shipmentTypes = types;
+      // Correction : le mode présélectionné ET son prix viennent de la même source (plus de 14 codé en dur).
+      if (!this.form.controls.shipmentTypeCode.value && types.length > 0) {
+        this.form.controls.shipmentTypeCode.setValue(types[0].code);
+      }
+    });
   }
 
-  backtoCart(){
+  get productsTotal(): number {
+    return this.cart.total;
+  }
 
-  this.dataService.bodyToSend={code:"",fname:"",lname:"",tel:"",address:"",city:"",postalCode:"",zip:"",email:"",status:"",shipmentType:"",products:[],paiement:{}};
+  get selectedShipmentType(): ShipmentType | undefined {
+    return this.shipmentTypes.find(t => t.code === this.form.controls.shipmentTypeCode.value);
+  }
 
-  this.router.navigate(['/cart'])
+  get shippingCost(): number {
+    return this.selectedShipmentType?.price ?? 0;
+  }
+
+  get total(): number {
+    return this.productsTotal + this.shippingCost;
+  }
+
+  /** Vrai si le champ doit afficher son erreur (après saisie ou après tentative d'envoi). */
+  showError(name: keyof ShippingInfo): boolean {
+    const control = this.form.controls[name];
+    return control.invalid && (control.touched || this.submitted);
+  }
+
+  submit(): void {
+    this.submitted = true;
+    const type = this.selectedShipmentType;
+    if (this.form.invalid || !type) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.checkout.saveShipping(this.form.getRawValue(), type);
+    this.router.navigate(['/paiement']);
   }
 }

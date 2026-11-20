@@ -1,0 +1,44 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card shadow-sm text-center p-4">
+        <i class="fa-solid fa-circle-check fa-4x text-success mb-3"></i>
+        <h1 class="h3">Merci pour votre commande !</h1>
+        <p class="text-muted">Conservez ce code : il vous permet de suivre votre livraison.</p>
+
+        <div class="d-flex justify-content-center align-items-center gap-2 my-3">
+          <span class="fs-4 fw-bold font-monospace border rounded px-3 py-1 bg-light">{{ code }}</span>
+          <button class="btn btn-outline-secondary btn-sm" (click)="copyCode()" aria-label="Copier le code">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
+
+        <div *ngIf="shipment as s" class="text-start mt-3">
+          <p class="mb-2">
+            Livraison à <strong>{{ s.firstName }} {{ s.lastName }}</strong>, {{ s.address }}, {{ s.postalCode }} {{ s.city }}
+            — {{ s.shipmentType.name }}.
+          </p>
+          <table class="table table-sm align-middle">
+            <thead><tr><th>Produit</th><th class="text-center">Qté</th><th class="text-end">Montant</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let item of s.items">
+                <td>{{ item.productName }}</td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-end">{{ item.lineTotal | currency }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr><td colspan="2">Livraison</td><td class="text-end">{{ s.payment.shipmentPrice | currency }}</td></tr>
+              <tr class="fw-bold"><td colspan="2">Total payé</td><td class="text-end">{{ s.payment.total | currency }}</td></tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-center gap-2 mt-3">
+          <a [routerLink]="['/suivi']" [queryParams]="{ code: code }" class="btn btn-primary">Suivre ma commande</a>
+          <a routerLink="/produits" class="btn btn-outline-secondary">Retour à la boutique</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
