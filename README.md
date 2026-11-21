@@ -1,13 +1,62 @@
 # DeliveryCommands
 
-Boutique en ligne avec suivi de livraison : frontend Angular 16 + backend Spring Boot (`backend/`).
+Application web de commande en ligne et de suivi de livraison, réalisée dans le cadre d'un projet de fin d'année (PFA) à l'ENSA de Fès.
 
-## Lancer le projet
+Le client parcourt le catalogue, passe commande et suit sa livraison avec un code de suivi. Le commerçant gère les commandes depuis un espace administrateur sécurisé.
+
+## Fonctionnalités
+
+**Côté client**
+- Catalogue avec recherche et filtre par catégorie, affichage du stock
+- Panier conservé après actualisation de la page, quantités limitées au stock disponible
+- Tunnel de commande : livraison, paiement, confirmation avec code de suivi
+- Suivi de commande par code et e-mail, sans exposer les données personnelles
+- Interface en français, prix en dirhams (MAD), affichage adapté au mobile
+
+**Côté administrateur**
+- Connexion sécurisée par jeton JWT
+- Tableau de bord : nombre de commandes, chiffre d'affaires, commandes à livrer, produits en stock faible
+- Recherche et filtre des commandes, changement de statut : traitée → expédiée → en route → livrée
+
+> Le paiement est **simulé** : aucune donnée bancaire n'est envoyée ni enregistrée.
+
+## Technologies
+
+| Partie | Technologies |
+|---|---|
+| Frontend | Angular 16, TypeScript, RxJS, Bootstrap 5, ngx-toastr |
+| Backend | Java 17, Spring Boot 4, Spring Data JPA, Spring Security (JWT, BCrypt), Bean Validation |
+| Base de données | H2 (fichier local, aucune installation nécessaire) |
+
+## Architecture
+
+```
+Navigateur ── Angular (composants, services, intercepteurs HTTP, guards)
+                 │  HTTP + JSON
+                 ▼
+API REST ──── Spring Boot (contrôleurs → services → repositories)
+                 │
+                 ▼
+             Base H2
+```
+
+Les prix, les totaux et le stock sont **toujours calculés par le serveur** : le navigateur n'envoie que les identifiants des produits et les quantités.
+
+## Installation et lancement
+
+**Prérequis :** Git, Node.js 18, JDK 17.
+
+```bash
+git clone https://github.com/imad14serrar/DeliveryCommands.git
+cd DeliveryCommands
+```
 
 | Partie | Dossier | Commande | Adresse |
 |---|---|---|---|
-| API (Java 17) | `backend/` | `.\mvnw spring-boot:run` | http://localhost:8080 |
-| Site (Node 18) | racine | `npm install` puis `npm start` | http://localhost:4200 |
+| API | `backend/` | `.\mvnw spring-boot:run` (Windows) ou `./mvnw spring-boot:run` | http://localhost:8080 |
+| Site | racine | `npm install` puis `npm start` | http://localhost:4200 |
+
+Au premier démarrage, l'API crée automatiquement un catalogue de 10 produits et quelques commandes de démonstration.
 
 ## Accès administrateur
 
@@ -19,30 +68,36 @@ Espace admin : http://localhost:4200/admin (icône bouclier dans le menu).
 
 Le mot de passe peut être remplacé sans modifier le code avec la variable d'environnement `ADMIN_PASSWORD`.
 
----
+## API REST
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.1.
+| Méthode | Route | Accès | Rôle |
+|---|---|---|---|
+| GET | `/api/products`, `/api/categories`, `/api/shipment-types` | Public | Catalogue et modes de livraison |
+| POST | `/api/shipments` | Public | Création d'une commande |
+| GET | `/api/shipments/track?code=…&email=…` | Public | Suivi d'une commande |
+| POST | `/api/auth/login` | Public | Connexion administrateur |
+| GET | `/api/admin/shipments` | Admin | Liste des commandes |
+| PATCH | `/api/admin/shipments/{code}/status` | Admin | Changement de statut |
+| GET | `/api/admin/stats` | Admin | Indicateurs du tableau de bord |
 
-## Development server
+## Structure du projet
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```
+DeliveryCommands/
+├── backend/                  API Spring Boot
+│   └── src/main/java/ma/pfa/delivery/
+│       ├── controller/       routes REST
+│       ├── service/          règles métier
+│       ├── repository/       accès aux données
+│       ├── entity/           modèle de données
+│       ├── dto/              format des échanges JSON
+│       ├── config/           sécurité, données initiales
+│       └── exception/        gestion des erreurs
+└── src/app/                  application Angular
+    ├── product-list/, cart/, shipment-page/, paiment-online/,
+    │   order-confirmation/, trafic-orders/, contact-us/   pages client
+    ├── admin/                connexion et tableau de bord
+    ├── service/              accès à l'API, panier, authentification
+    ├── interceptors/         erreurs, jeton JWT, chargement
+    └── guards/               protection de la navigation
+```
