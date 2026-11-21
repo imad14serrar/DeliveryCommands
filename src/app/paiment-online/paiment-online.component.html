@@ -8,12 +8,6 @@
     <div class="col-lg-6 col-md-8">
       <div class="card shadow-sm">
         <div class="card-body p-4">
-          <div class="alert alert-info small" role="note">
-            <i class="fa-solid fa-circle-info me-1"></i>
-            <strong>Paiement simulé (démonstration).</strong> Les informations de carte sont vérifiées dans votre
-            navigateur mais ne sont jamais transmises ni enregistrées. Exemple de numéro valide : 4111 1111 1111 1111.
-          </div>
-
           <form [formGroup]="paymentForm" (ngSubmit)="submitPayment()" novalidate>
             <div class="mb-3">
               <label for="cardOwner" class="form-label fw-semibold">Titulaire de la carte</label>
