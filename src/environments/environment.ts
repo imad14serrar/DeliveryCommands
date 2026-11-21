@@ -5,9 +5,9 @@ export const environment = {
   apiUrl: 'http://localhost:8080/api',
   shopName: 'DeliveryCommands',
   contact: {
-    email: 'contact@exemple.ma',
-    phone: '+212 5 00 00 00 00',
-    address: 'ENSA Fès, Maroc',
-    hours: 'Lundi – samedi : 9h30 – 22h30'
+    email: 'imad14serrar@gmail.com',
+    phone: '+212 6 20 67 44 41',
+    address: 'Fès, Maroc',
+    hours: 'Lundi – dimanche : 9h30 – 22h30'
   }
 };

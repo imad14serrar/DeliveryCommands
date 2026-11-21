@@ -3,11 +3,11 @@ export const environment = {
   production: false,
   apiUrl: 'http://localhost:8080/api',
   shopName: 'DeliveryCommands',
-  // Coordonnées affichées sur la page Contact : À REMPLACER par les vôtres.
+  // Coordonnées affichées sur la page Contact.
   contact: {
-    email: 'contact@exemple.ma',
-    phone: '+212 5 00 00 00 00',
-    address: 'ENSA Fès, Maroc',
-    hours: 'Lundi – samedi : 9h30 – 22h30'
+    email: 'imad14serrar@gmail.com',
+    phone: '+212 6 20 67 44 41',
+    address: 'Fès, Maroc',
+    hours: 'Lundi – dimanche : 9h30 – 22h30'
   }
 };
