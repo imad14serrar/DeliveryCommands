@@ -1,8 +1,17 @@
 # DeliveryCommands
 
-Application web de commande en ligne et de suivi de livraison, réalisée dans le cadre d'un projet de fin d'année (PFA) à l'ENSA de Fès.
+Application web de commande en ligne et de suivi de livraison, développée dans le cadre d'un projet de fin d'année (PFA) à l'ENSA de Fès.
 
 Le client parcourt le catalogue, passe commande et suit sa livraison avec un code de suivi. Le commerçant gère les commandes depuis un espace administrateur sécurisé.
+
+## Origine du projet
+
+Ce dépôt poursuit le développement d'une version initiale de l'application, réalisée en 2023 en Angular par une équipe de trois étudiants : [app-DeliveryCommands](https://github.com/OussamaDarif/app-DeliveryCommands). Cette version proposait le catalogue, un panier et un formulaire de commande reliés à une API distante, sans backend, base de données ni espace d'administration.
+
+Travail réalisé dans le cadre du PFA :
+- **Créé** : backend Spring Boot (API REST, sécurité JWT), base de données H2, espace administrateur, page de confirmation
+- **Réécrit** : panier, livraison, paiement et suivi de commande (montants calculés par le serveur, suivi par code et e-mail)
+- **Conservé** : mise en page, images des produits et structure générale des données
 
 ## Fonctionnalités
 
